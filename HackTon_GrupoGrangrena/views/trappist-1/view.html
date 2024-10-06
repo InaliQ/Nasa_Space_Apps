@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planetas con Órbitas - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .planet-label {
+            position: absolute;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Contenedor para las etiquetas de los planetas -->
+<div id="labelsContainer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+<script>
+    // Variables globales
+    let scene, camera, renderer, planets = [], labels = [];
+    let labelsContainer = document.getElementById('labelsContainer');
+    let mouse = new THREE.Vector2();
+
+    // Crear la escena
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    // Crear la cámara
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 10, 60);
+
+    // Crear el renderizador
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Crear la luz (simulando la estrella Trappist-1)
+    let starLight = new THREE.PointLight(0xffff99, 2, 500);
+    starLight.position.set(0, 0, 0);
+    scene.add(starLight);
+
+    // Crear la estrella en el centro
+    const starGeometry = new THREE.SphereGeometry(3, 32, 32);
+    const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff99 });
+    const star = new THREE.Mesh(starGeometry, starMaterial);
+    scene.add(star);
+
+    // Etiqueta para la estrella
+    let starLabel = document.createElement('div');
+    starLabel.className = 'planet-label';
+    starLabel.textContent = "Trappist-1";
+    labelsContainer.appendChild(starLabel);
+
+    function updateStarLabel() {
+        const vector = new THREE.Vector3(star.position.x, star.position.y, star.position.z);
+        vector.project(camera);
+        
+        const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+        const y = -(vector.y * 0.5 - 0.5) * window.innerHeight;
+
+        starLabel.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+    }
+
+    // Geometría y materiales de los planetas
+    const planetGeometry = new THREE.SphereGeometry(2, 32, 32);
+    const planetMaterials = [
+        new THREE.MeshStandardMaterial({ color: 0x99ccff }), // Trappist-1b
+        new THREE.MeshStandardMaterial({ color: 0xff9933 }), // Trappist-1c
+        new THREE.MeshStandardMaterial({ color: 0x9966ff }), // Trappist-1d
+        new THREE.MeshStandardMaterial({ color: 0x66ff99 }), // Trappist-1e
+        new THREE.MeshStandardMaterial({ color: 0xff6699 }), // Trappist-1f
+        new THREE.MeshStandardMaterial({ color: 0x6699ff }), // Trappist-1g
+        new THREE.MeshStandardMaterial({ color: 0xffcc66 })  // Trappist-1h
+    ];
+
+    const planetDistances = [11, 15, 22, 28, 37, 45, 61];
+    const planetNames = ["Trappist-1b", "Trappist-1c", "Trappist-1d", "Trappist-1e", "Trappist-1f", "Trappist-1g", "Trappist-1h"];
+    const planetSpeeds = [0.0008, 0.00068, 0.00059, 0.00052, 0.00047, 0.00043, 0.00036];
+
+    // Crear planetas y sus órbitas
+    for (let i = 0; i < planetDistances.length; i++) {
+        let planet = new THREE.Mesh(planetGeometry, planetMaterials[i]);
+        planet.position.x = planetDistances[i];
+        planet.planetName = planetNames[i];
+        planets.push(planet);
+        scene.add(planet);
+
+        const orbitGeometry = new THREE.RingGeometry(planetDistances[i] - 0.05, planetDistances[i] + 0.05, 64);
+        const orbitMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+        const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+        orbit.rotation.x = Math.PI / 2;
+        scene.add(orbit);
+
+        let label = document.createElement('div');
+        label.className = 'planet-label';
+        label.textContent = planetNames[i];
+        labelsContainer.appendChild(label);
+        labels.push(label);
+    }
+
+    // Crear estrellas de fondo
+    const starsGeometry = new THREE.SphereGeometry(0.05, 24, 24);
+    const starsMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+    for (let i = 0; i < 200; i++) { // Puedes ajustar el número de estrellas aquí
+        let starBackground = new THREE.Mesh(starsGeometry, starsMaterial);
+        starBackground.position.x = Math.random() * 200 - 100; // Posición aleatoria en el eje X
+        starBackground.position.y = Math.random() * 200 - 100; // Posición aleatoria en el eje Y
+        starBackground.position.z = Math.random() * 200 - 100; // Posición aleatoria en el eje Z
+        scene.add(starBackground);
+    }
+
+    // Control de órbitas
+    function updatePlanets() {
+        planets.forEach((planet, index) => {
+            let speed = planetSpeeds[index];
+
+            // Actualizar posición del planeta
+            planet.position.x = planetDistances[index] * Math.cos(Date.now() * speed + index);
+            planet.position.z = planetDistances[index] * Math.sin(Date.now() * speed + index);
+
+            // Actualizar posición de la etiqueta
+            const vector = new THREE.Vector3(planet.position.x, planet.position.y, planet.position.z);
+            vector.project(camera);
+            const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+            const y = -(vector.y * 0.5 - 0.5) * window.innerHeight;
+            labels[index].style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
+        });
+    }
+
+    // Control de zoom
+    document.addEventListener('wheel', (event) => {
+        camera.position.z += event.deltaY * 0.05;
+    });
+
+    // Bucle de renderizado
+    function animate() {
+        requestAnimationFrame(animate);
+        updatePlanets();
+        updateStarLabel();
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Ajuste de tamaño en ventana
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Manejo de clics para planetas
+    function onMouseClick(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        let raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera(mouse, camera);
+
+        let intersects = raycaster.intersectObjects(planets);
+
+        if (intersects.length > 0) {
+            let clickedPlanet = intersects[0].object;
+            console.log(`Planeta clickeado: ${clickedPlanet.planetName}`);
+            zoomToPlanet(clickedPlanet);
+        }
+    }
+
+    function zoomToPlanet(planet) {
+        let targetPosition = new THREE.Vector3();
+        planet.getWorldPosition(targetPosition);
+
+        let tween = new TWEEN.Tween(camera.position).to({
+            x: targetPosition.x,
+            y: targetPosition.y + 5,
+            z: targetPosition.z + 10
+        });
+
+        // Redirigir a otra página después de hacer zoom
+        window.location = planet.planetName + "/" + planet.planetName.toLowerCase() + ".html";
+    }
+
+    document.addEventListener('click', onMouseClick);
+</script>
+
+</body>
+</html>

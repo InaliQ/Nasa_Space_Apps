@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Exoplanetas</title>
+    <style>
+        /* Estilos del modal */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed; /* Queda en una posición fija */
+            z-index: 1; /* Asegúrate que está en el frente */
+            left: 0;
+            top: 0;
+            width: 100%; /* Ancho completo */
+            height: 100%; /* Alto completo */
+            overflow: auto; /* Permite desplazamiento si es necesario */
+            background-color: rgba(0,0,0,0.4); /* Fondo negro con opacidad */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* Centrado en la página */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Ancho del modal */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Quiz Exoplanetas</h1>
+    <div id="quiz-content"></div>
+</div>
+
+<div id="explanationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="explanationText"></p>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            question: "¿Qué es un exoplaneta?",
+            options: [
+                { text: "Un planeta dentro del sistema solar", correct: false },
+                { text: "Un planeta que orbita una estrella fuera del sistema solar", correct: true },
+                { text: "Un planeta que está hecho solo de gas", correct: false },
+                { text: "Un satélite natural de un planeta", correct: false }
+            ],
+            explanation: "¡Ya se han descubierto más de 5,000 exoplanetas! Y lo emocionante es que apenas estamos empezando a explorar la galaxia."
+        },
+        {
+            question: "¿Cómo se descubren la mayoría de los exoplanetas?",
+            options: [
+                { text: "Midiendo el brillo de las estrellas", correct: true },
+                { text: "Observando directamente los planetas", correct: false },
+                { text: "Detectando ondas de radio", correct: false },
+                { text: "Escuchando sonidos del espacio", correct: false }
+            ],
+            explanation: "La mayoría de los exoplanetas se detectan por el método de tránsito, cuando un planeta pasa delante de su estrella, disminuyendo su brillo temporalmente."
+        },
+        {
+            question: "¿Qué característica especial tiene el sistema TRAPPIST-1?",
+            options: [
+                { text: "Es el sistema más cercano a la Tierra", correct: false },
+                { text: "Tiene varios planetas del tamaño de la Tierra", correct: true },
+                { text: "Es un sistema binario con dos estrellas", correct: false },
+                { text: "Es un sistema sin planetas", correct: false }
+            ],
+            explanation: "Los astrónomos descubrieron que 7 planetas en el sistema TRAPPIST-1 tienen un tamaño similar al de la Tierra. ¡Tres de ellos podrían estar en la zona habitable!"
+        },
+        {
+            question: "¿Qué tipo de estrella es TRAPPIST-1?",
+            options: [
+                { text: "Una gigante roja", correct: false },
+                { text: "Un agujero negro", correct: false },
+                { text: "Una enana roja", correct: true },
+                { text: "Una estrella azul", correct: false }
+            ],
+            explanation: "TRAPPIST-1 es una enana roja, una estrella pequeña y fría, lo que permite que sus planetas estén más cerca y aún puedan tener agua líquida."
+        },
+        {
+            question: "¿Qué significa que un exoplaneta esté en la 'zona habitable' de su estrella?",
+            options: [
+                { text: "Que tiene vida", correct: false },
+                { text: "Que su órbita está lo suficientemente cerca como para tener agua líquida", correct: true },
+                { text: "Que tiene una atmósfera de oxígeno", correct: false },
+                { text: "Que está lo suficientemente lejos de otras estrellas", correct: false }
+            ],
+            explanation: "Aunque un planeta esté en la zona habitable, no significa que tenga vida, pero es un buen comienzo para buscarla. ¡Aún estamos explorando!"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const quizContent = document.getElementById('quiz-content');
+    const explanationModal = document.getElementById("explanationModal");
+    const explanationText = document.getElementById("explanationText");
+    const closeModal = document.getElementsByClassName("close")[0];
+
+    function showQuestion() {
+        const question = questions[currentQuestionIndex];
+        let quizHTML = `
+            <div class="question">
+                <h2>${question.question}</h2>
+                <ul class="options">
+                    ${question.options.map((option, index) => `<li><button onclick="checkAnswer(${index})">${option.text}</button></li>`).join('')}
+                </ul>
+            </div>
+        `;
+        quizContent.innerHTML = quizHTML;
+    }
+
+    function checkAnswer(selectedIndex) {
+        const question = questions[currentQuestionIndex];
+        if (question.options[selectedIndex].correct) {
+            score += 5;
+            showExplanation(question.explanation);
+        } else {
+            showExplanation("Respuesta incorrecta. ¡Inténtalo en la siguiente!");
+        }
+    }
+
+    function showExplanation(explanation) {
+        explanationText.innerHTML = explanation;
+        explanationModal.style.display = "block";
+        setTimeout(nextQuestion, 3000); // Aumenté el tiempo a 3 segundos para que sea más dinámico
+    }
+
+    function nextQuestion() {
+        explanationModal.style.display = "none";
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizContent.innerHTML = `<h2>¡Has terminado el quiz!</h2><p class="result">Tu puntaje final es: ${score} de ${questions.length * 5}.</p>`;
+    }
+
+    closeModal.onclick = function() {
+        explanationModal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == explanationModal) {
+            explanationModal.style.display = "none";
+        }
+    }
+
+    // Mostrar la primera pregunta
+    showQuestion();
+</script>
+
+</body>
+</html>

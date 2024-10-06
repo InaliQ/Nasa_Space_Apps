@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Planeta</title>
+    <link rel="stylesheet" href="trappist-1b.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <h1>Exoplaneta Trappist-1b</h1>
+    <div style="position: relative; width: 100%;">
+        <h5 style="width: 100%; max-height: 100px; max-width: 100px; border-radius: 10px; position: absolute; right: 0; top: -25px;">Quiz!!!!!!s</h5>
+        <img id="quizBtn" src="../../../source/autronauta.png" style="width: 100%; max-height: 100px; max-width: 100px; border-radius: 10px; position: absolute; right: 0; top: -80px; cursor: pointer;" alt="">
+    </div>
+    <div class="container">
+        <div class="left-section">
+            <h3>Norte</h3>
+            <img src="../../../source/vistas/b_norte.png" alt="Imagen superior del planeta">
+            <button style="padding: 1px; margin: 3px;">Conoce más</button>
+            <img src="../../../source/vistas/b_sur.png" alt="Imagen inferior del planeta">
+            <h3>Sur</h3>
+        </div>
+        <div class="planet-container">
+            <img src="../../../source/mercury-13188_256.gif" alt="Planeta Venus girando">
+            
+        </div>
+        <div class="right-section">
+            <h2>Información General</h2>
+            <p>Orbita la estrella enana ultrafría denominada TRAPPIST-1 aproximadamente a 40 años luz en la constelación de acuario. Fue descubierto en el año 2016 por el telescopio TRAPPIST mediante el tránsito astronómico.</p>
+            <h2>Características</h2>
+            <ul>
+                <li>Masa: 0,0027 ± 0,0023 MJ</li>
+                <li>Radio: 0,117 ± 0,004 m☉</li>
+                <li>Contelacion: Acuario</li>
+                <li>Temperatura: 400,1 ± 7,7400,1 (± 7,7) K</li>
+                <li>Distancia de la estrella: 12,1 ± 0,412,1 (± 0,4) pc</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Modal para las respuestas del quiz -->
+    <div class="alert-modal" id="alertModal">
+        <h2 id="alertTitle">Respuesta</h2>
+        <p id="alertMessage"></p>
+        <button class="alert-close-btn" id="alertCloseBtn">Cerrar</button>
+    </div>
+
+    <div class="modal" id="quizModal">
+        <div class="modal-content" id="quizContent">
+            <button class="close-btn" id="closeModal">Cerrar</button>
+            <div class="quiz-container">
+                <h1>Quiz Exoplanetas</h1>
+                <div id="quiz-content"></div>
+            </div>
+
+            <script>
+                const questions = [
+                    {
+                        question: "¿Qué es un exoplaneta?",
+                        options: [
+                            { text: "Un planeta dentro del sistema solar", correct: false },
+                            { text: "Un planeta que orbita una estrella fuera del sistema solar", correct: true },
+                            { text: "Un planeta que está hecho solo de gas", correct: false },
+                            { text: "Un satélite natural de un planeta", correct: false }
+                        ],
+                        explanation: "¡Ya se han descubierto más de 5,000 exoplanetas! Y lo emocionante es que apenas estamos empezando a explorar la galaxia."
+                    },
+                    {
+                        question: "¿Cómo se descubren la mayoría de los exoplanetas?",
+                        options: [
+                            { text: "Midiendo el brillo de las estrellas", correct: true },
+                            { text: "Observando directamente los planetas", correct: false },
+                            { text: "Detectando ondas de radio", correct: false },
+                            { text: "Escuchando sonidos del espacio", correct: false }
+                        ],
+                        explanation: "La mayoría de los exoplanetas se detectan por el método de tránsito, cuando un planeta pasa delante de su estrella, disminuyendo su brillo temporalmente."
+                    },
+                    {
+                        question: "¿Qué característica especial tiene el sistema TRAPPIST-1?",
+                        options: [
+                            { text: "Es el sistema más cercano a la Tierra", correct: false },
+                            { text: "Tiene varios planetas del tamaño de la Tierra", correct: true },
+                            { text: "Es un sistema binario", correct: false },
+                            { text: "Contiene un agujero negro", correct: false }
+                        ],
+                        explanation: "El sistema TRAPPIST-1 es notable porque tiene siete planetas del tamaño de la Tierra, algunos de los cuales están en la zona habitable."
+                    }
+                ];
+
+                let currentQuestionIndex = 0;
+                let score = 0;
+
+                const quizContent = document.getElementById('quizContent');
+                const alertModal = document.getElementById('alertModal');
+                const alertTitle = document.getElementById('alertTitle');
+                const alertMessage = document.getElementById('alertMessage');
+                const alertCloseBtn = document.getElementById('alertCloseBtn');
+
+                function showQuestion() {
+                    const question = questions[currentQuestionIndex];
+                    const quizHTML = `
+                        <h2>${question.question}</h2>
+                        <ul class="options">
+                            ${question.options.map((option, index) => `
+                                <li><button onclick="checkAnswer(${index})">${option.text}</button></li>
+                            `).join('')}
+                        </ul>
+                    `;
+                    quizContent.innerHTML = quizHTML;
+                }
+
+                function checkAnswer(selectedIndex) {
+                    const question = questions[currentQuestionIndex];
+                    const selectedOption = question.options[selectedIndex];
+
+                    if (selectedOption.correct) {
+                        score++;
+                        showAlert("¡Correcto!", "Bien hecho, tu respuesta es correcta.");
+                    } else {
+                        showAlert("Incorrecto", question.explanation);
+                    }
+
+                    currentQuestionIndex++;
+
+                    if (currentQuestionIndex < questions.length) {
+                        showQuestion();
+                    } else {
+                        showResults();
+                    }
+                }
+
+                function showResults() {
+                    quizContent.innerHTML = `
+                        <h2>Resultados</h2>
+                        <p>Obtuviste ${score} de ${questions.length} respuestas correctas.</p>
+                        <button onclick="resetQuiz()">Reiniciar Quiz</button>
+                    `;
+                }
+
+                function resetQuiz() {
+                    currentQuestionIndex = 0;
+                    score = 0;
+                    showQuestion();
+                }
+
+                function showAlert(title, message) {
+                    alertTitle.innerText = title;
+                    alertMessage.innerText = message;
+                    alertModal.style.display = 'block';
+                }
+
+                alertCloseBtn.onclick = function() {
+                    alertModal.style.display = 'none';
+                };
+
+                document.getElementById('quizBtn').onclick = function() {
+                    document.getElementById('quizModal').classList.add('show');
+                    showQuestion(); // Mostrar la primera pregunta al abrir el modal
+                };
+
+                document.getElementById('closeModal').onclick = function() {
+                    document.getElementById('quizModal').classList.remove('show');
+                };
+            </script>
+    <script src="trappist-1b.js"></script>
+
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exoplanets</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            position: absolute;
+            top: 20px;
+            font-size: 3em;
+            text-align: center;
+        }
+
+        button {
+            position: relative;
+            background-color: transparent;
+            border: 2px solid #fff;
+            color: white;
+            font-size: 1.5em;
+            padding: 15px 40px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 50px rgba(255, 255, 255, 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 300%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transition: left 0.75s ease-in-out;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        #starCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starCanvas"></canvas>
+
+    <h1>Welcome to Exoplanets</h1>
+    <button id="startButton">Start</button>
+
+    <script>
+        // Configuración del lienzo
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Crear las estrellas
+        let stars = [];
+        const numStars = 200;
+
+        function createStars() {
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    alpha: Math.random(),
+                    dx: Math.random() * 0.5,
+                    dy: Math.random() * 0.5
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+            });
+        }
+
+        function updateStars() {
+            stars.forEach(star => {
+                star.x += star.dx;
+                star.y += star.dy;
+
+                // Cuando las estrellas salen del lienzo, reaparecen en otra posición
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y > canvas.height) star.y = 0;
+                if (star.x < 0) star.x = canvas.width;
+                if (star.y < 0) star.y = canvas.height;
+            });
+        }
+
+        function animate() {
+            drawStars();
+            updateStars();
+            requestAnimationFrame(animate);
+        }
+
+        createStars();
+        animate();
+
+        // Redimensionar el canvas al cambiar el tamaño de la ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            createStars();
+        });
+
+        const startButton = document.getElementById('startButton');
+        startButton.addEventListener('click', () => {
+            window.location.href = './views/trappist-1/view.html';
+        });
+    </script>
+</body>
+</html>

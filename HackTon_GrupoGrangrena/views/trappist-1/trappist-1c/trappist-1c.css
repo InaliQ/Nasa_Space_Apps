@@ -1,0 +1,129 @@
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #000;
+            color: white;
+            overflow: hidden; /* Evitar el desplazamiento */
+        }
+        h1 {
+            margin: 20px 0;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px;
+            height: 600px; /* Altura fija para la sección del modelo 3D */
+        }
+        .left-section, .right-section {
+            width: 250px; /* Ancho fijo para las secciones */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1a1a1a;
+            border-radius: 10px;
+        }
+        .planet-container {
+            flex: 1;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden; /* Recortar contenido */
+            display: flex;
+            align-items: center; /* Centrar verticalmente */
+            justify-content: center; /* Centrar horizontalmente */
+        }
+        img {
+            width: 100%; /* Ajustar el ancho al contenedor */
+            max-height: 600px; /* Limitar la altura */
+            border-radius: 10px;
+        }
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            right: -50%; /* Posición inicial fuera de pantalla */
+            width: 50%;
+            height: 100%;
+            background-color: #1a1a1a;
+            border-left: 1px solid #333;
+            overflow: hidden;
+            transition: right 0.5s ease; /* Transición suave */
+            display: none; /* Oculto por defecto */
+        }
+        .modal-content {
+            padding: 20px;
+            color: white;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: red;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .show {
+            display: block;
+            right: 0; /* Mover hacia la pantalla cuando se muestre */
+        }
+        /* Estilos para los botones del quiz */
+        .options li {
+            list-style: none;
+            margin: 10px 0;
+        }
+        .options button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%; /* Hacer que el botón ocupe todo el ancho */
+            font-size: 16px;
+        }
+        .options button:hover {
+            background-color: #0056b3;
+        }
+        /* Estilos para el modal de respuesta */
+        .alert-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000; /* Asegurarse de que esté sobre otros elementos */
+            display: none; /* Oculto por defecto */
+        }
+        .alert-modal h2 {
+            margin: 0 0 10px;
+        }
+        .alert-modal p {
+            margin: 10px 0;
+        }
+        .alert-close-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .alert-close-btn:hover {
+            background-color: #c82333;
+        }
